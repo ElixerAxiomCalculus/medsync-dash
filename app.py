@@ -1,4 +1,3 @@
-#For starting a Flask server
 from flask import Flask, jsonify, render_template, request
 import pandas as pd
 import joblib
@@ -6,12 +5,10 @@ import joblib
 
 app = Flask(__name__)
 
-# Test endpoint
 @app.route('/')
 def home():
     return jsonify({'message': 'MedSync API is running'})
 
-# Prediction endpoint (initially empty)
 @app.route('/predict_single', methods=['POST'])
 def predict_single():
     data = request.get_json()
