@@ -3,7 +3,6 @@ import requests
 import pandas as pd
 import time
 import difflib
-# --------- SETTINGS ---------
 st.set_page_config(page_title="MedSync", page_icon="💊", layout="wide")
 st.markdown("""
     <style>
@@ -153,8 +152,7 @@ time.sleep(3)
 loader.empty()
 
 
-
-# --------- STYLES ---------
+#style
 st.markdown("""
 <style>
 /* Fade-in sections */
@@ -204,7 +202,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --------- TITLE ---------
+#dashboard
 st.markdown("""
     <h1 id="dashboard" style='text-align:center; font-size:48px; margin-bottom:10px;'>
         💊 <span style='color:#e74c3c;'>Med</span><span style='color:#2980b9;'>Sync</span>
@@ -212,7 +210,7 @@ st.markdown("""
     <p style='text-align:center; font-size:18px; margin-top:0px;'>Your AI-powered Medicine Demand Dashboard</p>
 """, unsafe_allow_html=True)
 
-# --------- DATA FETCH ---------
+#fetch preddata
 try:
     response = requests.get("http://127.0.0.1:5000/predict")
     data = response.json()
@@ -224,18 +222,16 @@ except:
 df = pd.read_csv("../backend/data/data.csv")
 df['Predicted_Daily_Usage'] = predictions
 
-# --------- SIDEBAR FILTERS ---------
+#sidebar
 st.sidebar.markdown("## 🛠️ Filters")
 low_stock_threshold = st.sidebar.slider("📉 Low Stock Threshold", 5, 50, 30)
 expiry_threshold = st.sidebar.slider("⌛ Expiry Warning Threshold", 15, 180, 60)
 
-# --------- STATUS LOGIC ---------
 df['Status'] = '✅ Normal'
 df.loc[df['Current_Stock'] < low_stock_threshold, 'Status'] = '⚠️ Low Stock'
 df.loc[df['Days_Until_Expiry'] < expiry_threshold, 'Status'] = '⌛ Expiring Soon'
 df.loc[(df['Current_Stock'] < low_stock_threshold) & (df['Days_Until_Expiry'] < expiry_threshold), 'Status'] = '🔥 Critical'
 
-# --------- VIEW FILTER ---------
 view_option = st.sidebar.radio("🔍 View Options", ["All", "Low Stock", "Expiring Soon", "Critical Only"])
 if view_option == "Low Stock":
     filtered_df = df[df['Status'].str.contains("Low Stock|Critical")]
@@ -246,7 +242,7 @@ elif view_option == "Critical Only":
 else:
     filtered_df = df
 
-# --------- SEARCH BAR ---------
+#search
 st.markdown("### 🔍 Search Medicine")
 
 medicine_options = sorted(df["Medicine_Name"].unique())
@@ -259,22 +255,20 @@ selected_search = st.selectbox(
 if selected_search != "All":
     filtered_df = filtered_df[filtered_df["Medicine_Name"].str.contains(selected_search, case=False)]
 
-# --------- SMART STATS ---------
+# stats
 st.markdown("### 📊 Inventory Summary")
 col1, col2, col3 = st.columns(3)
 col1.metric("🔥 Critical", df[df['Status'] == '🔥 Critical'].shape[0])
 col2.metric("⚠️ Low Stock", df[df['Status'] == '⚠️ Low Stock'].shape[0])
 col3.metric("⌛ Expiring Soon", df[df['Status'] == '⌛ Expiring Soon'].shape[0])
 
-# --------- MAIN TABLE ---------
 st.markdown("### 📋 Current Stats of Common Medicines")
 st.dataframe(filtered_df.reset_index(drop=True), use_container_width=True)
 
-# --------- BAR CHART ---------
 st.markdown("<h3 id='stats'>📈 Predicted Daily Usage</h3>", unsafe_allow_html=True)
 st.bar_chart(filtered_df.set_index('Medicine_Name')['Predicted_Daily_Usage'])
 
-# --------- FILE UPLOAD ---------
+#fileupload
 st.markdown("---")
 st.markdown("<h3 id='upload'>📤 Upload Your Own Inventory</h3>", unsafe_allow_html=True)
 
@@ -295,7 +289,6 @@ if uploaded_file is not None:
     except:
         st.error("❌ Uploaded CSV must have columns: 'Medicine_Name', 'Current_Stock', 'Days_Until_Expiry'")
 
-# --------- MANUAL ENTRY ---------
 st.markdown("---")
 st.markdown("<h3 id='manual'>🧪 Try Manual Entry</h3>", unsafe_allow_html=True)
 
@@ -313,23 +306,21 @@ if st.button("🔮 Predict Usage"):
         pred = res.json()["prediction"]
         st.success(f"📈 **{medicine_name}** — Predicted Daily Usage: **{round(pred, 2)} units/day**")
 
-# --------- INTERACTIVE CHATBOT (BOTTOM) ---------
+#chatbot
 
 st.markdown("---")
 st.subheader("💬 MedSync Assistant (in beta)")
 
 faq_df = pd.read_csv("faq.csv")
 
-# Display a welcome message
 st.chat_message("assistant").write("Hi! I'm your MedSync Assistant 🤖. Ask me anything about this dashboard.")
 
-# Chat UI input
 query = st.chat_input("Ask a question...")
 
 if query:
     st.chat_message("user").write(query)
 
-    # Match from FAQ
+    # match faq.csv
     match = difflib.get_close_matches(query.lower(), faq_df['question'].str.lower(), n=1, cutoff=0.4)
 
     if match:
