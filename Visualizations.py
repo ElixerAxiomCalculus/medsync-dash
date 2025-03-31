@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import altair as alt
 import time
 st.set_page_config(page_title="📊 Insights", layout="wide")
-# --------- PRELOADER (5 sec with pill animation) ---------
+
 loader = st.empty()
 loader.markdown("""
     <style>
@@ -58,9 +58,7 @@ def load_data():
 
 df = load_data()
 
-# -----------------------
-# 🔥 1. Correlation Heatmap
-# -----------------------
+#heatmap
 st.subheader("🔗 Correlation Heatmap")
 
 numeric_cols = ["Current_Stock", "Days_Until_Expiry", "Average_Daily_Usage"]
@@ -70,9 +68,7 @@ fig, ax = plt.subplots()
 sns.heatmap(corr, annot=True, cmap="coolwarm", ax=ax)
 st.pyplot(fig)
 
-# -----------------------
-# 📈 2. Trendline: Usage vs Days Until Expiry
-# -----------------------
+
 st.subheader("📉 Trendline: Usage vs Days Until Expiry")
 
 chart = alt.Chart(df).mark_circle(size=60).encode(
@@ -87,12 +83,10 @@ regression = alt.Chart(df).transform_regression(
 
 st.altair_chart(chart + regression, use_container_width=True)
 
-# -----------------------
-# 📌 3. Smart Alerts
-# -----------------------
+#smart alert
 st.subheader("📌 Smart Alerts")
 
-# Rebuild Status column manually
+
 low_stock_threshold = 30
 expiry_threshold = 60
 
@@ -102,12 +96,12 @@ df.loc[df['Days_Until_Expiry'] < expiry_threshold, 'Status'] = '⌛ Expiring Soo
 df.loc[(df['Current_Stock'] < low_stock_threshold) & 
        (df['Days_Until_Expiry'] < expiry_threshold), 'Status'] = '🔥 Critical'
 
-# Count statuses
+
 critical_count = len(df[df['Status'] == "🔥 Critical"])
 low_stock_count = len(df[df['Status'].str.contains("Low Stock")])
 expiring_count = len(df[df['Status'].str.contains("Expiring Soon")])
 
-# Display alerts
+
 st.markdown(f"""
 - 🔥 **Critical entries**: `{critical_count}` ⚠️  
 - 📦 **Low stock medicines**: `{low_stock_count}`  
