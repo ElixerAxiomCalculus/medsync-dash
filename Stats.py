@@ -4,7 +4,7 @@ import altair as alt
 import time
 import difflib
 st.set_page_config(page_title="📊 Medicine Stats", layout="wide")
-# --------- PRELOADER (5 sec with pill animation) ---------
+
 loader = st.empty()
 loader.markdown("""
     <style>
