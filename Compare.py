@@ -3,7 +3,6 @@ import pandas as pd
 import altair as alt
 import time
 st.set_page_config(page_title="🆚 Compare Medicines", layout="wide")
-# --------- PRELOADER (5 sec with pill animation) ---------
 loader = st.empty()
 loader.markdown("""
     <style>
@@ -71,7 +70,6 @@ if df1.empty or df2.empty:
     st.warning("⚠️ One of the selected medicines has no data.")
     st.stop()
 
-# --- Stats Comparison ---
 st.markdown("### 📊 Key Stats Comparison")
 
 col1, col2 = st.columns(2)
@@ -88,7 +86,6 @@ with col2:
     st.metric("📈 Avg. Predicted Usage", f"{df2['Average_Daily_Usage'].mean():.2f}")
     st.metric("⏳ Avg. Expiry Days", f"{df2['Days_Until_Expiry'].mean():.2f}")
 
-# --- Bar Charts Side by Side ---
 st.markdown("### 📊 Distribution Charts")
 
 b1, b2 = st.columns(2)
@@ -109,16 +106,13 @@ with b2:
         use_container_width=True
     )
 
-# --- Line Chart Comparison of Daily Usage ---
 st.markdown("### 📈 Daily Usage Line Chart Comparison")
 
-# Add index for x-axis
 df1 = df1.reset_index(drop=True)
 df2 = df2.reset_index(drop=True)
 df1["Index"] = df1.index
 df2["Index"] = df2.index
 
-# Assign label for merging
 df1["Medicine"] = med1
 df2["Medicine"] = med2
 combined_df = pd.concat([df1, df2])
