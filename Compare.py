@@ -56,7 +56,6 @@ def load_data():
 df = load_data()
 medicine_list = sorted(df["Medicine_Name"].unique())
 
-# --- Dropdowns to Select Medicines ---
 col1, col2 = st.columns(2)
 with col1:
     med1 = st.selectbox("Select Medicine 1", medicine_list, key="med1")
